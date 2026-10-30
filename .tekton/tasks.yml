@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  steps:
+    - name: cleanup
+      image: alpine:3.17
+      script: |
+        #!/bin/sh
+        echo "Cleaning workspace"
+        rm -rf .pytest_cache .coverage coverage.xml
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: test
+spec:
+  steps:
+    - name: run-unit-tests
+      image: python:3.9-slim
+      script: |
+        #!/bin/sh
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        nosetests -v --with-spec --spec-color --with-coverage --cover-package=app
